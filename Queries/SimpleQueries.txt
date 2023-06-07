@@ -1,0 +1,36 @@
+SELECT Name, Age, Medication_Name, Date 
+FROM Patient, Medication, Medical History;
+
+SELECT * FROM Person, Patient, Insurance 
+WHERE Policy = Delta_Dental;
+
+SELECT Medical_prodessonal_name, Procedures_performed, Date
+FROM Invoice WHERE Medical_professioal_name = Doctor Smilow;
+
+SELECT Date, Charge, PatId, Name, Phone_number, Email_address
+FROM Invoice, Patient, Person
+WHERE Date-Current_Date > 30 AND Charge > 10;
+
+SELECT Name, PatID, SUM(Charge) 
+FROM (SELECT Name, PatID, Date, Charge 
+	FROM Person, Patient, Invoice
+WHERE Date-Current_Date <366) 
+GROUP BY PatID;
+
+SELECT Medical_professional_name, COUNT(Medical_procedures_performed) as Num_procedures
+FROM((SELECT Date, Medical_professional_name, Procedures_performed 
+FROM Invoice 
+	WHERE Date-Current_Date <366)) 
+GROUP BY Medical_professional_name 
+WHERE Num_procedurese <5;
+
+SELECT Procedure_Type, Per_unit_charges_per_insurance_plan, quantities FROM Procedures 
+ORDER BY per_unit_charges_per_insurace_plan DESC;
+
+SELECT Charge 
+FROM Invoice
+
+SELECT Company_name, COUNT(PatID) 
+FROM(SELECT Company_name, Payer_ID, PatID 
+	FROM Insurance, Patient) 
+GROUP_BY Company_name;

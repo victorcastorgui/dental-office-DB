@@ -1,0 +1,9 @@
+SELECT Procedure_Type, Max(Quantities)
+FROM Procedures;
+
+SELECT AVG(Cost) 
+FROM Equipment;
+
+SELECT Name, PatID, Count(Date) 
+FROM (SELECT * FROM Person, Patient, Appointment) 
+GROUP BY PatId;

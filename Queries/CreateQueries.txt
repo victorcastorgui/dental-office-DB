@@ -1,0 +1,292 @@
+-- Creation of Office Schema using SMSS
+CREATE SCHEMA Office;
+USE Office;
+
+CREATE TABLE "Person" (
+	"PatID" INTEGER UNIQUE,
+	"Username" TEXT NOT NULL,
+	"Occupation" TEXT NOT NULL,
+	"Gender" TEXT NOT NULL,
+	"Password" TEXT NOT NULL,
+	"email_address" TEXT NOT NULL UNIQUE,
+	"phone_number" INTEGER NOT NULL UNIQUE,
+	"SSN" INTEGER NOT NULL UNIQUE,
+	"DOB" INTEGER NOT NULL,
+	"Address" TEXT NOT NULL,
+	"Name" TEXT NOT NULL,
+	"EmpID" INTEGER UNIQUE,
+	"JobType" TEXT,
+	"Employment History" TEXT,
+	"Education" TEXT NOT NULL,
+	"Criminal History" TEXT,
+	PRIMARY KEY("PatID","email_address","phone_number","SSN","EmpID"),
+	FOREIGN KEY("PatID") REFERENCES "Patient"("PatID"),
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Equipment_type" (
+	"Equipment_type" TEXT NOT NULL UNIQUE,
+	"Quanity" INTEGER NOT NULL,
+	"Cost" INTEGER NOT NULL,
+	PRIMARY KEY("Equipment_type")
+);
+
+CREATE TABLE "Purchase_Details" (
+	"EmpID" INTEGER NOT NULL,
+	"Purchase_ID" INTEGER NOT NULL,
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Date_of_Purchase" (
+	"Equipment_type" TEXT NOT NULL,
+	"Date_of_purchase" DATE NOT NULL,
+	"Purchase_ID" INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("Purchase_ID")
+);
+
+CREATE TABLE "Employee" (
+	"LicenseID" INTEGER NOT NULL,
+	"EmpID" INTEGER NOT NULL,
+	"JobType" TEXT NOT NULL UNIQUE,
+	"Education" TEXT NOT NULL UNIQUE,
+	"Criminal History" TEXT,
+	PRIMARY KEY("EmpID")
+);
+
+CREATE TABLE "Employment_History" (
+	"EmpHistoryID" INTEGER NOT NULL,
+	"EmpID" INTEGER NOT NULL UNIQUE,
+	"CompanyName" TEXT,
+	"StartDate" DATE,
+	"EndDate" DATE,
+	PRIMARY KEY("EmpID")
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "JobTitle" (
+	"JobTitle" INTEGER NOT NULL,
+	"EmpID" INTEGER NOT NULL UNIQUE,
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Patient" (
+	"Member_ID" INTEGER NOT NULL,
+	"SSN" INTEGER NOT NULL UNIQUE,
+	"PatID" INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("PatID"),
+	FOREIGN KEY("SSN") REFERENCES "Person"("SSN")
+	FOREIGN KEY("Member_ID") REFERENCES "Insurance_Company"("Member_ID")
+);
+
+CREATE TABLE "Patient_Profile" (
+	"Member_ID" INTEGER NOT NULL,
+	"Username" TEXT NOT NULL,
+	"Gender" TEXT NOT NULL,
+	"Password" TEXT NOT NULL
+);
+
+CREATE TABLE "Patient_Occupation" (
+	"SSN" INTEGER NOT NULL,
+	"Occupation" TEXT NOT NULL
+);
+
+CREATE TABLE "HIPAA Form" (
+	"PatID" INTEGER NOT NULL,
+	"Form_ID" INTEGER NOT NULL,
+	"DateSigned" DATE NOT NULL,
+	PRIMARY KEY("Form_ID"),
+	FOREIGN KEY("PatID") REFERENCES "Patient"("PatID")
+);
+
+CREATE TABLE "Schedule" (
+	"AppID" INTEGER NOT NULL,
+	"EmpID" INTEGER NOT NULL,
+	"Order_of_sched" INTEGER NOT NULL,
+	"ScheduleID" INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("ScheduleID"),
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Appointment" (
+	"AppointmentID" INTEGER NOT NULL UNIQUE,
+	"Time" TIME NOT NULL,
+	"Description" TEXT NOT NULL,
+	"Date" DATE NOT NULL,
+	PRIMARY KEY("AppointmentID")
+);
+
+CREATE TABLE "Patient_Appointment" (
+	"PatID" INTEGER NOT NULL,
+	"AppointmentID" INTEGER NOT NULL UNIQUE,
+	FOREIGN KEY("AppointmentID") REFERENCES "Appointment"("AppointmentID"),
+  Foreign key("PatID") REFERENCES "Patient"("PatID")
+);
+
+CREATE TABLE "Licensure" (
+	"Certifications" TEXT NOT NULL,
+	"LicenseID" INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("LicenseID")
+);
+
+CREATE TABLE "Payment" (
+	"PatID" INTEGER NOT NULL,
+	"BillingID" INTEGER NOT NULL,
+	"MemberID" INTEGER NOT NULL,
+	"Date" DATE NOT NULL,
+	"PaymentID" INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("PaymentID"),
+	FOREIGN KEY("PatID") REFERENCES "Patient"("PatID"),
+	FOREIGN KEY("BillingID") REFERENCES "Invoice"("BillingID"),
+	FOREIGN KEY("MemberID") REFERENCES "Insurance_Company"("Member_ID")
+);
+
+CREATE TABLE "Insurance_Company" (
+	"Company_name" TEXT NOT NULL,
+	"Member_ID" INTEGER NOT NULL UNIQUE,
+	"Company_address" TEXT NOT NULL,
+	"Company_phone_number" INTEGER NOT NULL,
+	"Policy_ID" INTEGER NOT NULL,
+	PRIMARY KEY("Member_ID"),
+	FOREIGN KEY("Policy_ID") REFERENCES "Policy"("Policy_ID")
+);
+
+CREATE TABLE "Policy" (
+	"Policy_ID" INTEGER NOT NULL UNIQUE,
+	"Policy_Details" TEXT NOT NULL,
+	PRIMARY KEY("Policy_ID")
+);
+
+CREATE TABLE "Procedure" (
+	"AppID" INTEGER NOT NULL,
+	"EmpID" INTEGER NOT NULL,
+	"Billing_ID" INTEGER NOT NULL,
+	"LicenseID" INTEGER NOT NULL,
+	"Procedure_ID" INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("Procedure_ID"),
+	FOREIGN KEY("AppID") REFERENCES "Appointment"("AppID"),
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID"),
+	FOREIGN KEY("Billing_ID") REFERENCES "Invoice"("Billing_ID"),
+	FOREIGN KEY("LicenseID") REFERENCES "Insurance_Company"("LicenseID")
+);
+
+CREATE TABLE "Procedure_Details" (
+	"Quantities" INTEGER NOT NULL,
+	"Procedure_type" TEXT NOT NULL,
+	"Per unit charges per insurance plan" INTEGER NOT NULL,
+	"Procedure_ID" INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("Procedure_ID"),
+	FOREIGN KEY("Procedure_ID") REFERENCES "App_Proc"("Procedure_ID")
+);
+
+CREATE TABLE "Allergy" (
+	"MH_ID" INTEGER NOT NULL,
+	"AllergyID" INTEGER NOT NULL UNIQUE,
+	"Severity" TEXT NOT NULL,
+	"Allergen" TEXT NOT NULL,
+	"Last Reaction Date" DATE NOT NULL,
+	"Reaction" TEXT NOT NULL,
+	"Diagnose Date" DATE NOT NULL,
+	PRIMARY KEY("AllergyID"),
+	FOREIGN KEY("MH_ID") REFERENCES "Medical History"("MH_ID")
+);
+
+CREATE TABLE "Medication" (
+	"MedicationID" INTEGER NOT NULL,
+	"Start Date" DATE NOT NULL,
+	"End Date" DATE NOT NULL,
+	"Route of Administration" TEXT NOT NULL,
+	"Provider" TEXT NOT NULL,
+	"Dosage" TEXT NOT NULL,
+	"Medication Name" TEXT NOT NULL,
+	"Frequency" TEXT NOT NULL,
+	PRIMARY KEY("MedicationID")
+);
+
+CREATE TABLE "Ins_Acctypes" (
+	"Accepted Types" TEXT NOT NULL,
+	"Member_ID" INTEGER NOT NULL,
+	FOREIGN KEY("Member_ID") REFERENCES "Insurance_Company"("Member_ID")
+);
+
+CREATE TABLE "Doctor" (
+	"SSN" INTEGER NOT NULL UNIQUE,
+	"EmpID" INTEGER NOT NULL UNIQUE,
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Nurse" (
+	"SSN" INTEGER NOT NULL UNIQUE,
+	"EmpID" INTEGER NOT NULL UNIQUE,
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Receptionist" (
+	"SSN" INTEGER NOT NULL UNIQUE,
+	"EmpID" INTEGER NOT NULL UNIQUE,
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Hiring Manager" (
+	"SSN" INTEGER NOT NULL UNIQUE,
+	"EmpID" INTEGER NOT NULL UNIQUE,
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "Debit Card" (
+	"PaymentID" INTEGER NOT NULL UNIQUE,
+	"DC_number" INTEGER NOT NULL UNIQUE,
+	"Exp_date" DATE NOT NULL,
+	PRIMARY KEY("DC_number"),
+	FOREIGN KEY("PaymentID") REFERENCES "Payment"("PaymentID")
+);
+
+CREATE TABLE "Payment Plan" (
+	"PaymentID" INTEGER NOT NULL UNIQUE,
+	"Num_of_install" INTEGER NOT NULL,
+	FOREIGN KEY("PaymentID") REFERENCES "Payment"("PaymentID")
+);
+
+CREATE TABLE "Credit Card" (
+	"PaymentID" INTEGER NOT NULL UNIQUE,
+	"CC_number" INTEGER NOT NULL UNIQUE,
+	"Exp_date" DATE NOT NULL,
+	PRIMARY KEY("PaymentID"),
+	FOREIGN KEY("PaymentID") REFERENCES "Payment"("PaymentID")
+);
+
+CREATE TABLE "Check" (
+	"PaymentID" INTEGER NOT NULL UNIQUE,
+	"Check_ID" INTEGER NOT NULL,
+	PRIMARY KEY("Check_ID"),
+	FOREIGN KEY("PaymentID") REFERENCES "Payment"("PaymentID")
+);
+
+CREATE TABLE "Medical History" (
+	"PatID" INTEGER NOT NULL,
+	"EmpID" INTEGER NOT NULL,
+	"MH_ID" INTEGER NOT NULL UNIQUE,
+	"Emergency contact info" INTEGER NOT NULL,
+	"Date of Last X-Ray" DATE NOT NULL,
+	"Surgery Info" TEXT NOT NULL,
+	"Date" DATE NOT NULL,
+	"Preferred_pharmacy" TEXT NOT NULL,
+	"Immunization" TEXT NOT NULL,
+	"Physical_text/exam" TEXT NOT NULL,
+	PRIMARY KEY("MH_ID"),
+	FOREIGN KEY("PatID") REFERENCES "Patient"("PatID"),
+	FOREIGN KEY("EmpID") REFERENCES "Employee"("EmpID")
+);
+
+CREATE TABLE "App_Proc" (
+	"AppointmentID" INTEGER NOT NULL,
+	"ProcedureID" INTEGER NOT NULL,
+	FOREIGN KEY("AppointmentID") REFERENCES "Invoice"("AppointmentID"),
+	FOREIGN KEY("ProcedureID") REFERENCES "Procedure"("ProcedureID")
+);
+
+CREATE TABLE "All_Med" (
+	"AllergyID" INTEGER NOT NULL,
+	"MedicationID" INTEGER NOT NULL,
+	FOREIGN KEY("AllergyID") REFERENCES "Allergy"("AllergyID"),
+	FOREIGN KEY("MedicationID") REFERENCES "Medication"("MedicationID")
+);
